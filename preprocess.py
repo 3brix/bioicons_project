@@ -5,35 +5,56 @@ import requests  # source/usage w3schools: https://www.w3schools.com/PYTHON/ref_
 import cairosvg
 from PIL import Image
 
-# test url for one svg
-url = "https://raw.githubusercontent.com/duerrsimon/bioicons/main/static/icons/cc-0/Nucleic_acids/Kumar/DNA.svg"
 
+# test url for one svg
+#url = "https://raw.githubusercontent.com/duerrsimon/bioicons/main/static/icons/cc-0/Nucleic_acids/Kumar/DNA.svg"
 
 # config, folderstructure: static/svg (raw), static/png: img + caption(.txt.)
 input_folder = Path("static/svg")
 output_folder = Path("static/png")
+
+input_folder.mkdir(exist_ok=True)
 output_folder.mkdir(exist_ok=True)
 
-#img
+# img
+limit = 5  # nr of svgs fetched
 size = 1024 # to be compatible with FLUX.1-dev
 output_png = output_folder / "DNA.png"
-#caption
+
+# caption
 instance_name: str = "bioicon"
 class_name: str = "style"
 instance_prompt = "scientific icon, white background"
 
 
 # find data, data located on github, loop through folders
+api_url = "https://api.github.com/repos/duerrsimon/bioicons/content/static/icons/"
 
-# download the .svgs in local folder
-response = requests.get(url)
-response.raise_for_status()
 
-# convert svgs into pngs(1024)
-#for svg_file in input_folder.glob("*.svg"):
-#    png_file=output_folder /svg_file.with_suffix(".png").name
 
-    # convert
+svg_urls = []
+
+def find_svgs(url):
+    """
+    Recursively looks for icons. Opens folders till there is a leaf (svg-file), then put it in the collection. Stops once reaching limit.
+    """
+    if len(svg_urls) >= limit: return # safety check: limits
+    res = requests.get(url)
+    if res.status_code != 200: return # status check
+
+    items = res.json()  # more info: https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#get-repository-content
+    for item in items:
+        if len(svg_urls) >= limit: break
+        if item["type"] == "dir":
+            find_svgs(item["url"])
+        elif item ["name"].endswith(".svg"):
+            svg_urls.append((item["name"], item["download_url"]))
+
+print("Searching for icons...")
+find_svgs(api_url)
+
+
+# for loop
 png_data = cairosvg.svg2png(
      bytestring=response.content,
     # write_to=str(png_file),
