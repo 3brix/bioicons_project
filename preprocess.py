@@ -6,9 +6,6 @@ import cairosvg
 from PIL import Image
 
 
-# test url for one svg
-#url = "https://raw.githubusercontent.com/duerrsimon/bioicons/main/static/icons/cc-0/Nucleic_acids/Kumar/DNA.svg"
-
 # config, folderstructure: static/svg (raw), static/png: img + caption(.txt.)
 input_folder = Path("static/svg")
 output_folder = Path("static/png")
@@ -28,7 +25,9 @@ instance_prompt = "scientific icon, white background"
 
 
 # find data, data located on github, loop through folders
-api_url = "https://api.github.com/repos/duerrsimon/bioicons/content/static/icons/"
+print(f"Fetching icons from Bioicons GitHub...")
+api_url = "https://api.github.com/repos/duerrsimon/bioicons/contents/static/icons"
+response = requests.get(api_url)
 
 
 
@@ -54,39 +53,42 @@ print("Searching for icons...")
 find_svgs(api_url)
 
 
-# for loop
-png_data = cairosvg.svg2png(
-     bytestring=response.content,
-    # write_to=str(png_file),
-     output_width=size,
-     output_height=size,  # if img not square can cause problems, using only width can maintain initial aspect ratio
-    # background_color="white" (if no additional preprocessing)
+for name, download_url in svg_urls:
+    print(f"Processing...: {name}")
+    # fetch
+    svg_res = requests.get(download_url)
+    if svg_res.status_code != 200: continue
+
+
+    # rasterize
+    png_data = cairosvg.svg2png(
+        bytestring=svg_res.content,
+        output_width=size,
+        # output_height=size,  # if img not square can cause problems, using only width can maintain initial aspect ratio
+        # background_color="white" (if no additional preprocessing)
     )
 
-# white background
-img = Image.open(io.BytesIO(png_data)).convert("RGBA")
-# center?
-white_bg = Image.new("RGBA", img.size, (255, 255, 255))  # no alpha channel needed
-# paste using the original image as mask --> smooth edges?
-white_bg.paste(img, mask=img)
-white_bg.save(output_png, "PNG")
+
+    # white background
+    img = Image.open(io.BytesIO(png_data)).convert("RGBA")
+    white_bg = Image.new("RGBA", img.size, (255, 255, 255, 255)) 
+    # paste using the original image as mask --> smooth edges?
+    white_bg.paste(img, mask=img)
+    final_img = white_bg.convert("RGB")
+    # save
+    png_path = output_folder / name.replace(".svg", ".png")
+    final_img.save(png_path, "PNG")
 
 
-print(f"Test ok {output_png}")
+    # generate captions using the image names
+    img_path = png_path
+    # .with_suffix(".txt") changes the extension perfectly
+    caption_path = img_path.with_suffix(".txt")
+    # .stem gets the filename without any extension
+    simple_name = img_path.stem.replace("_", " ").replace("-", " ")
 
-
-
-# generate captions using the image names
-# Convert string to a Path object
-img_path = Path(output_png)
-
-# .with_suffix(".txt") changes the extension perfectly
-caption_path = img_path.with_suffix(".txt")
-
-# .stem gets the filename without any extension
-simple_name = img_path.stem.replace("_", " ").replace("-", " ")
-
-with open(caption_path, "w") as f:
-    f.write(f" a {instance_name} {class_name} illustration of {simple_name}, {instance_prompt}")
+    with open(caption_path, "w") as f:
+        f.write(f"a {instance_name} {class_name} illustration of {simple_name}, {instance_prompt}")
 
 # save ds  
+print("Preprocessing complete.")
