@@ -32,16 +32,23 @@ png_data = cairosvg.svg2png(
      bytestring=response.content,
     # write_to=str(png_file),
      output_width=size,
-     output_height=size,  
+     output_height=size,  # if img not square can cause problems, using only width can maintain initial aspect ratio
+    # background_color="white" (if no additional preprocessing)
     )
 
-img = Image.open(io.BytesIO(png_data))
-img.save(output_png)
+# white background
+# pillow
+img = Image.open(io.BytesIO(png_data)).convert("RGBA")
+# center?
+white_bg = Image.new("RGBA", img.size, (255, 255, 255))  # no alpha channel needed
+# paste using the original image as mask --> smooth edges?
+white_bg.paste(img, mask=img)
+white_bg.save(output_png, "PNG")
 
 
 print(f"Test ok {output_png}")
 
-# white background
+
 
 # generate captions using the image names
 
