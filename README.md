@@ -11,7 +11,7 @@ The raw data consist of 2804 icons(bioicons.com) as svg-files categorized by sci
 ## 3. Related related work / problems / tasks in literature
 
 ## 4. Preprocessing
-In progress ... The plan is to find the data automatically (located on the github page of bioicons in static, loop through subfolders) then download the svg files into a local folder. Then convert svgs into pngs(1024) and normalize them using cairosvg/pillow, then generate captions using the image names. 
+In progress... The initial plan was to find the data automatically (located on the github page of bioicons in static, loop through subfolders) then download the SVG-files into a local folder. A recursive function was created to navigate the nested folders via the GitHub API, identifying and gathering download links for multiple svg-files. Then each SVG is then downloaded, converted (without saving them --> memory) into a 1024 pixel PNG using cairosvg, and processed with PIL to replace transparency with solid white background for better model compatibility. Finally, the script generates matching captions as TXT, based on the original filename of the svgs and utilizing a special trigger prompt to associate the visual data with the textual descriptions for trining. 
 
 ## 5. Initial Model
 
