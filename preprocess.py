@@ -56,8 +56,15 @@ print(f"Test ok {output_png}")
 
 
 # generate captions using the image names
-caption_path = output_png.replace(".png", ".txt")
-simple_name = output_png.replace(".svg", ""). replace("_", " ").replace("-", " ")
+# Convert string to a Path object
+img_path = Path(output_png)
+
+# .with_suffix(".txt") changes the extension perfectly
+caption_path = img_path.with_suffix(".txt")
+
+# .stem gets the filename without any extension
+simple_name = img_path.stem.replace("_", " ").replace("-", " ")
+
 with open(caption_path, "w") as f:
     f.write(f" a {instance_name} {class_name} illustration of {simple_name}, {instance_prompt}")
 
