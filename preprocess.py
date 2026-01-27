@@ -14,8 +14,14 @@ input_folder = Path("static/svg")
 output_folder = Path("static/png")
 output_folder.mkdir(exist_ok=True)
 
+#img
 size = 1024 # to be compatible with FLUX.1-dev
 output_png = output_folder / "DNA.png"
+#caption
+instance_name: str = "bioicon"
+class_name: str = "style"
+instance_prompt = "scientific icon, white background"
+
 
 # find data, data located on github, loop through folders
 
@@ -37,7 +43,6 @@ png_data = cairosvg.svg2png(
     )
 
 # white background
-# pillow
 img = Image.open(io.BytesIO(png_data)).convert("RGBA")
 # center?
 white_bg = Image.new("RGBA", img.size, (255, 255, 255))  # no alpha channel needed
@@ -51,5 +56,9 @@ print(f"Test ok {output_png}")
 
 
 # generate captions using the image names
+caption_path = output_png.replace(".png", ".txt")
+simple_name = output_png.replace(".svg", ""). replace("_", " ").replace("-", " ")
+with open(caption_path, "w") as f:
+    f.write(f" a {instance_name} {class_name} illustration of {simple_name}, {instance_prompt}")
 
 # save ds  
