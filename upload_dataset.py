@@ -28,7 +28,7 @@ def main():
                 batch.put_file(file_path, file_path.name)
                 count += 1
         
-    print(f"Upload complete! {count} files uploaded to 'bioicons-animals'.")
+    print(f"Upload complete! {count} files uploaded to 'bioicons'.")
 
 # CLI
 # run: modal run upload_dataset.py
