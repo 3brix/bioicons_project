@@ -4,10 +4,10 @@ from pathlib import Path
 import modal
 
 # define app
-app = modal.App("dataset-uploader")
+app = modal.App("bioicons-flux")
 
 # define the volume
-volume = modal.Volume.from_name("bioicons-animals", create_if_missing=True)
+volume = modal.Volume.from_name("bioicons", create_if_missing=True)
 
 LOCAL_DATASET = Path("static/png")
 
