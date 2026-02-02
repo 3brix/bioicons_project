@@ -16,7 +16,7 @@ output_folder.mkdir(exist_ok=True)
 # img
 limit = 5  # nr of svgs fetched
 size = 1024 # to be compatible with FLUX.1-dev
-output_png = output_folder / "DNA.png"
+output_png = output_folder
 
 # caption
 instance_name: str = "bioicon"
@@ -30,10 +30,11 @@ api_url = "https://api.github.com/repos/duerrsimon/bioicons/contents/static/icon
 response = requests.get(api_url)
 
 
+target_categories = ["Human_physiology", "Intracellular_components", "Genetics"]
 
 svg_urls = []
 
-def find_svgs(url):
+def find_svgs(url, current_depth=0):
     """
     Recursively looks for icons. Opens folders till there is a leaf (svg-file), then put it in the collection. Stops once reaching limit.
     """
@@ -44,8 +45,11 @@ def find_svgs(url):
     items = res.json()  # more info: https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#get-repository-content
     for item in items:
         if len(svg_urls) >= limit: break
+
         if item["type"] == "dir":
-            find_svgs(item["url"])
+            if current_depth != 1 or item["name"] in target_categories:
+                 find_svgs(item["url"], current_depth + 1)
+
         elif item ["name"].endswith(".svg"):
             svg_urls.append((item["name"], item["download_url"]))
 
