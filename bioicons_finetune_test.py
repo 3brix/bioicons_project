@@ -203,8 +203,8 @@ def generate_sweep_configs(sweep_config: SweepConfig):
 @app.function(
     image=image,
     gpu="A100-80GB",
-    volumes={MODEL_DIR: volume},  # stores fine-tuned model
-    timeout=7200,  # 30 minutes
+    volumes={MODEL_DIR: volume, DATASET_PATH: dataset_volume},  # stores fine-tuned model
+    timeout=7200,  
     secrets=[
         modal.Secret.from_name("wandb"),
         modal.Secret.from_name("huggingface-secret"),
@@ -212,9 +212,9 @@ def generate_sweep_configs(sweep_config: SweepConfig):
     if USE_WANDB
     else [modal.Secret.from_name("huggingface-secret")],
 )
+
 def train(config):
     import subprocess
-
     from accelerate.utils import write_basic_config
 
     # load data locally
@@ -247,9 +247,9 @@ def train(config):
             "examples/dreambooth/train_dreambooth_lora_flux.py",
             "--mixed_precision=bf16",  # half-precision floats most of the time for faster training
             f"--pretrained_model_name_or_path={config['model_name']}",
-            f"--dataset_name={config['dataset_name']}",
+            #f"--dataset_name={config['dataset_name']}",
             #f"--instance_data_dir={config['dataset_name']}",
-            #f"--instance_data_dir={DATASET_PATH}",
+            f"--train_data_dir={DATASET_PATH}",
             f"--caption_column={config['caption_column']}",
             f"--output_dir={config['output_dir']}",
             f"--instance_prompt={config['instance_prompt']}",
