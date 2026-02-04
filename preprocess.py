@@ -68,7 +68,7 @@ for name, download_url in svg_urls:
     png_data = cairosvg.svg2png(
         bytestring=svg_res.content,
         output_width=size,
-        # output_height=size,  # if img not square can cause problems, using only width can maintain initial aspect ratio
+        output_height=size,  # if img not square can cause problems, using only width can maintain initial aspect ratio
         # background_color="white" (if no additional preprocessing)
     )
 
