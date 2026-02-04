@@ -59,10 +59,12 @@ else:
                 caption_path = img_path.with_suffix(".txt")
                 # .stem gets the filename without any extension
                 simple_name = img_path.stem.replace("_", " ").replace("-", " ")
+                # get right article (a/an)
+                article = "an" if simple_name[0].lower() in "aeiou" else "a"
 
 
                 with open(caption_path, "w") as f:
-                    f.write(f"a {instance_name} {class_name} illustration of {simple_name}, {instance_prompt}")
+                    f.write(f"a {instance_name} {class_name} illustration of {article} {simple_name}, {instance_prompt}")
                 
                 print(f"Success: {name}")
 
