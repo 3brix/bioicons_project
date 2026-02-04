@@ -12,13 +12,12 @@ output_folder.mkdir(exist_ok=True)
 # img
 target_categories = ["Animals"]
 size = 1024
-lo
 
 # caption
 # limit = 5
 instance_name = "bioicon"
 class_name = "style"
-instance_prompt = "scientific icon, white background"
+instance_prompt = "flat vector icon, white background"
 
 print(f"Starting preprocessing for categories: {target_categories}")
 
@@ -37,8 +36,8 @@ for category in target_categories:
                 # rasterization, convert SVG -> PNG
                 png_data = cairosvg.svg2png(
                     url=str(svg_file),
-                    output_width=size
-                    # output_height=size,  # if img not square can cause problems, using only width can maintain initial aspect ratio
+                    output_width=size,
+                    output_height=size,  # if img not square can cause problems, using only width can maintain initial aspect ratio (but is it ok though?)
                     # background_color="white" (if no additional preprocessing)
                 )
 
@@ -49,6 +48,8 @@ for category in target_categories:
                 # paste using the original image as mask --> smooth edges?
                 white_bg.paste(img, mask=img)
                 final_img = white_bg.convert("RGB")
+
+                # center?
 
                 # save
                 png_path = output_folder / name.replace(".svg", ".png")
