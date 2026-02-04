@@ -128,24 +128,24 @@ class TrainConfig(SharedConfig):
     train_batch_size: int = 1
     rank: int = 16  # lora rank
     gradient_accumulation_steps: int = 1
-    learning_rate: float = 4e-4
+    learning_rate: float = 1e-4
     lr_scheduler: str = "constant"
     lr_warmup_steps: int = 0
-    max_train_steps: int = 2000
-    checkpointing_steps: int = 1000
+    max_train_steps: int = 1000
+    checkpointing_steps: int = 500
     seed: int = 0
 
 
 @dataclass
 class SweepConfig(TrainConfig):
     """Configuration for hyperparameter sweep"""
-
-    # Sweep parameters
-    learning_rates = [2e-4]
-    # train_steps = [1000, 1500, 3000, 4000]
+    # sweep params
+    learning_rates = [1e-4]
+    # learning_rates = [1e-4, 2e-4, 3e-4]
     train_steps = [1000]
-    # ranks = [4, 8, 16]
+    # train_steps = [1000, 1500, 3000, 4000]
     ranks = [16]
+    # ranks = [8, 16, 32] ?
 
 
     bioicon_test_prompts = [
@@ -337,7 +337,7 @@ def fastapi_app():
         if not text:
             text = example_prompts[0]
         print(text, config)
-        image, prompt = Model(hyperparameter_model_dir="lr_0.0002_steps_1000_rank_16").inference.remote(
+        image, prompt = Model(hyperparameter_model_dir="lr_0.0001_steps_1000_rank_16").inference.remote(
             text, config
         )
         return image
