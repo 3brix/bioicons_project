@@ -8,7 +8,7 @@ from PIL import Image
 
 # # config, folderstructure: static/svg (raw), static/png: img + caption(.txt.)
 input_folder = Path("static/raw_png_curated")
-output_folder = Path("static/png")
+output_folder = Path("static/png_curated")
 output_folder.mkdir(exist_ok=True, parents=True)
 
 # img
