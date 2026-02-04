@@ -5,12 +5,11 @@ import cairosvg
 from PIL import Image
 
 # # config, folderstructure: static/svg (raw), static/png: img + caption(.txt.)
-repo_root = Path("bioicons/static/icons")
+input_folder = Path("static/raw_png_curated")
 output_folder = Path("static/png")
-output_folder.mkdir(exist_ok=True)
+output_folder.mkdir(exist_ok=True, parents=True)
 
 # img
-target_categories = ["Animals"]
 size = 1024
 
 # caption
@@ -19,18 +18,15 @@ instance_name = "bioicon"
 class_name = "style"
 instance_prompt = "flat vector icon, white background"
 
-print(f"Starting preprocessing for categories: {target_categories}")
+print(f"Starting preprocessing data from {input_folder}.")
 
 # local loop
-for category in target_categories:
-    # search repo_root for any folder matching our category
-    category_search = repo_root.rglob(f"**/{category}")
-    
-    for category_path in category_search:
-        if not category_path.is_dir():
-            continue
+svg_files=list(input_folder.glob("*.svg"))
             
-        for svg_file in category_path.rglob("*.svg"):
+if not svg_files:
+            print: (f"No svg files in {input_folder}.")
+else: 
+    for svg_file in svg_files:
             name = svg_file.name
             try:
                 # rasterization, convert SVG -> PNG
@@ -71,4 +67,4 @@ for category in target_categories:
             except Exception as e:
                 print(f"Skipping {name} due to error: {e}")
 
-print(f"\nPreprocessing complete! All pairs are in {output_folder}")
+print(f"\nPreprocessing complete! All pairs are in {output_folder}, yay.")
