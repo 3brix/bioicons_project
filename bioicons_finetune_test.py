@@ -92,7 +92,7 @@ MODEL_DIR = "/model"
 dataset_volume = modal.Volume.from_name("bioicons", create_if_missing=True)
 DATASET_PATH = "/mnt/bioicons"
 
-# function to load dataset (used in training loop)
+# sanity check
 def load_bioicons_dataset(dataset_path: str):
     images, captions = [], []
     dataset_dir = Path(dataset_path)
@@ -120,7 +120,7 @@ class TrainConfig(SharedConfig):
     dataset_name: str = "/mnt/bioicons" 
     caption_column: str = "text"
 
-    instance_prompt = "scientific icon on white background"  
+    instance_prompt = "flat vector icon, white background"  
     # training prompt looks like `{PREFIX} {INSTANCE_NAME} the {CLASS_NAME} {POSTFIX}`
     prefix: str = ""
     postfix: str = ""
@@ -150,21 +150,21 @@ class SweepConfig(TrainConfig):
     # ranks = [4, 8, 16] ?
 
     bioicon_test_prompts = [
-        "a bioicon style illustration of a jellyfish, scientific icon, white background",
-        "a bioicon style illustration of a dinosaur skull, scientific icon, white background",
-        "a bioicon style illustration of a neuron, scientific icon, white background",
-        "a bioicon style illustration of a virus particle, scientific icon, white background",
-        "a bioicon style illustration of a leaf cross section, scientific icon, white background",
-        "a bioicon style illustration of a snail, scientific icon, white background",
-        "a bioicon style illustration of a bat, scientific icon, white background",
-        "a bioicon style illustration of a deep sea fish, scientific icon, white background",
-        "a bioicon style illustration of a frog, scientific icon, white background",
-        "a bioicon style illustration of a crab, scientific icon, white background",
-        "a bioicon style illustration of a beetle, scientific icon, white background",
-        "a bioicon style illustration of a bird, scientific icon, white background",
-        "a bioicon style illustration of a lion, scientific icon, white background",
-        "a bioicon style illustration of a turtle, scientific icon, white background",
-        "a bioicon style illustration of a butterfly, scientific icon, white background",
+        "a bioicon style illustration of a jellyfish, flat vector icon, white background",
+        "a bioicon style illustration of a dinosaur skull, flat vector icon, white background",
+        "a bioicon style illustration of a neuron, flat vector icon, white background",
+        "a bioicon style illustration of a virus particle, flat vector icon, white background",
+        "a bioicon style illustration of a leaf cross section, flat vector icon, white background",
+        "a bioicon style illustration of a snail, flat vector icon, white background",
+        "a bioicon style illustration of a bat, flat vector icon, white background",
+        "a bioicon style illustration of a deep sea fish, flat vector icon, white background",
+        "a bioicon style illustration of a frog, flat vector icon, white background",
+        "a bioicon style illustration of a crab, flat vector icon, white background",
+        "a bioicon style illustration of a beetle, flat vector icon, white background",
+        "a bioicon style illustration of a bird, flat vector icon, white background",
+        "a bioicon style illustration of a lion, flat vector icon, white background",
+        "a bioicon style illustration of a turtle, flat vector icon, white background",
+        "a bioicon style illustration of a butterfly, flat vector icon, white background",
     ]
 
 
@@ -203,7 +203,7 @@ def generate_sweep_configs(sweep_config: SweepConfig):
 @app.function(
     image=image,
     gpu="A100-80GB",
-        volumes={MODEL_DIR: volume, DATASET_PATH: dataset_volume},
+    volumes={MODEL_DIR: volume},  # stores fine-tuned model
     timeout=7200,  # 30 minutes
     secrets=[
         modal.Secret.from_name("wandb"),
@@ -214,35 +214,29 @@ def generate_sweep_configs(sweep_config: SweepConfig):
 )
 def train(config):
     import subprocess
-    from accelerate.utils import write_basic_config
-    from pathlib import Path
 
-    # load data
-    images, captions = load_bioicons_dataset(DATASET_PATH)
-    print(f"Loaded {len(images)} images and {len(captions)} captions for training")
+    from accelerate.utils import write_basic_config
+
+    # load data locally
 
     # set up hugging face accelerate library for fast training
     write_basic_config(mixed_precision="bf16")
 
     # the model training is packaged as a script, so we have to execute it as a subprocess, which adds some boilerplate
-def _exec_subprocess(cmd: list[str]):
-    import subprocess
-    process = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        universal_newlines=True,
-    )
-    output_lines = []
-    with process.stdout as pipe:
-        for line in iter(pipe.readline, ""):
-            output_lines.append(line)
-            print(line, end="")
-    exitcode = process.wait()
-    if exitcode != 0:
-        full_output = "".join(output_lines)
-        raise subprocess.CalledProcessError(exitcode, " ".join(cmd), output=full_output)
+    def _exec_subprocess(cmd: list[str]):
+        """Executes subprocess and prints log to terminal while subprocess is running."""
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        with process.stdout as pipe:
+            for line in iter(pipe.readline, b""):
+                line_str = line.decode()
+                print(f"{line_str}", end="")
 
+        if exitcode := process.wait() != 0:
+            raise subprocess.CalledProcessError(exitcode, "\n".join(cmd))
 
     # run training -- see huggingface accelerate docs for details
     print("launching dreambooth training script")
@@ -253,7 +247,9 @@ def _exec_subprocess(cmd: list[str]):
             "examples/dreambooth/train_dreambooth_lora_flux.py",
             "--mixed_precision=bf16",  # half-precision floats most of the time for faster training
             f"--pretrained_model_name_or_path={config['model_name']}",
-            f"--instance_data_dir={config['dataset_name']}",
+            f"--dataset_name={config['dataset_name']}",
+            #f"--instance_data_dir={config['dataset_name']}",
+            #f"--instance_data_dir={DATASET_PATH}",
             f"--caption_column={config['caption_column']}",
             f"--output_dir={config['output_dir']}",
             f"--instance_prompt={config['instance_prompt']}",
