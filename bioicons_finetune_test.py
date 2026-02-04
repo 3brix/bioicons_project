@@ -147,7 +147,7 @@ class SweepConfig(TrainConfig):
     train_steps = [1000]
     # train_steps = [1000, 1500, 3000, 4000]
     ranks = [16]
-    # ranks = [4, 8, 16] ?
+    # ranks = [8, 16, 32] ?
 
     bioicon_test_prompts = [
         "a bioicon style illustration of a jellyfish, flat vector icon, white background",
