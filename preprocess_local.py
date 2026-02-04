@@ -1,3 +1,5 @@
+# first you have to curate a subset the raw svgs in a folder
+
 import io
 import os
 from pathlib import Path
