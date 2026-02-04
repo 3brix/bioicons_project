@@ -92,18 +92,30 @@ MODEL_DIR = "/model"
 dataset_volume = modal.Volume.from_name("bioicons", create_if_missing=True)
 DATASET_PATH = "/mnt/bioicons"
 
-# sanity check
-def load_bioicons_dataset(dataset_path: str):
+from pathlib import Path
+
+def load_bioicon_dataset(dataset_path: str):
+    """
+    Loads all .png images in a folder and their matching .txt captions.
+    Returns:
+        images: list of Path objects
+        captions: list of strings
+    """
     images, captions = [], []
     dataset_dir = Path(dataset_path)
+
     for img_file in dataset_dir.glob("*.png"):
         txt_file = img_file.with_suffix(".txt")
         if txt_file.exists():
             images.append(img_file)
             with open(txt_file, "r") as f:
                 captions.append(f.read().strip())
-    print(f"Loaded {len(images)} images from {dataset_dir}")
+        else:
+            print(f"Warning: {img_file} has no matching caption, skipping.")
+
+    print(f"Loaded {len(images)} image-caption pairs from {dataset_dir}")
     return images, captions
+
 
 
 # This example can optionally use [Weights & Biases](https://wandb.ai) to track all of this training information.
@@ -249,7 +261,7 @@ def train(config):
             f"--pretrained_model_name_or_path={config['model_name']}",
             #f"--dataset_name={config['dataset_name']}",
             #f"--instance_data_dir={config['dataset_name']}",
-            f"--train_data_dir={DATASET_PATH}",
+            f"--instance_data_dir={DATASET_PATH}",
             f"--caption_column={config['caption_column']}",
             f"--output_dir={config['output_dir']}",
             f"--instance_prompt={config['instance_prompt']}",
