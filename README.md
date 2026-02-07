@@ -9,6 +9,19 @@ The dataset originates from bioicons.com, an open-source repository of scientifi
 The raw data consist of 2804 icons(bioicons.com) as SVG-files categorized by scientific field. The illustrations are contributed by various scientific illustrators, but generally follow a unified aesthetic. Most icons are under MIT, CC0 or CC-BY-(SA) licences, which makes them ideal for use them in academic projects. These licences allow to reuse, modify and build upon the data with easy-to-meet requirements (BY: credit must be given to the creator, SA: Adaptations must be licenced under the same terms). Source and details: https://mit-license.org/, https://creativecommons.org/share-your-work/cclicenses/.
 
 ## 3. Related related work / problems / tasks in literature
+Recent advances in text-to-image diffusion models have focused on efficient fine-tuning and subject-driven generation.
+Several adapter and fine-tuning strategies have emerged to improve efficiency and flexibility. Martini et al. provide a comparative overview of four popular methods, Dreambooth, LoRA, Hypernetworks, and Textual Inversion (1).
+
+
+Since our project uses a combined Dreambooth and LoRA we focus only on them. DreamBooth by Ruiz et al. is a training technique that updates the entire diffusion model by training on just a few images of a subject or style. It works by associating a special word in the prompt with the example images and can generate a wide variety of images of the subject in different contexts, guided by a text prompt (2),(5).
+
+
+LoRA by Hu et al. allows large models to adapt with minimal memory cost by freezing the base model weights and injecting small adapter modules (low-rank matrices into selected layers). This way most of the base model’s capabilities are retained while adding new, task-specific functionality (6).
+
+
+Hu et al. also states that “LoRA can be combined with other efficient adaptation methods, potentially providing orthogonal improvement”(3), e.g. DreamBooth to speedup training (7).
+
+A recent study by Pascua et al. (4) applies a few-shot, multi-token DreamBooth - LoRA approach using dreambooth_lora_flux.py on FLUX-based models, achieving style-consistent character generation.However, the study largely focus on artistic or character domains, there is currently limited evaluation of how well DreamBooth - LoRA preserves conceptual consistency and symbolic semantics rather than just visual style.
 
 ## 4. Preprocessing
 In progress... 
@@ -38,16 +51,34 @@ More on AI: Fist we tried to work with AI, but eventually it made us take detour
 ## 9. References
 
 Data:
-https://huggingface.co/datasets/yirenlu/heroicons-subset-25-images/viewer,
-https://modal.com/docs/reference/modal.Volume#batch_upload,hero,
-https://www.w3schools.com/PYTHON/ref_requests_response.asp,
-https://www.w3schools.com/python/python_recursion.asp,
-https://pytutorial.com/handling-transparency-and-alpha-channels-with-pillow/,
-https://medium.com/@ackmanb/,how-to-train-the-flux-1-image-generation-model-a-step-by-step-guide-291557d8f8db,
-https://huggingface.co/docs/datasets/en/image_dataset,
-https://www.geeksforgeeks.org/nlp/how-to-load-a-huggingface-dataset-from-local-path/,
-https://www.exgenex.com/article/how-to-create-a-huggingface-dataset
+https://huggingface.co/datasets/yirenlu/heroicons-subset-25-images/viewer, accesssed: 01.02.2026
+https://modal.com/docs/reference/modal.Volume#batch_upload,hero, accesssed: 01.02.2026
+https://www.w3schools.com/PYTHON/ref_requests_response.asp, accesssed: 01.02.2026
+https://www.w3schools.com/python/python_recursion.asp, accesssed: 01.02.2026
+https://pytutorial.com/handling-transparency-and-alpha-channels-with-pillow/, accesssed: 29.01.2026
+https://medium.com/@ackmanb/,how-to-train-the-flux-1-image-generation-model-a-step-by-step-guide-291557d8f8db, accesssed: 01.02.2026
+https://huggingface.co/docs/datasets/en/image_dataset, accesssed: 01.02.2026
+https://www.geeksforgeeks.org/nlp/how-to-load-a-huggingface-dataset-from-local-path/, accesssed: 04.02.2026
+https://www.exgenex.com/article/how-to-create-a-huggingface-dataset accesssed: 04.02.2026
+
+Literatur:
+1. Martini, L.; Iacono, S.; Zolezzi, D.; Vercelli, G.V. Advancing Persistent Character Generation: Comparative Analysis of Fine-Tuning Techniques for Diffusion Models. AI 2024, 5, 1779-1792. https://doi.org/10.3390/ai5040088
+
+2. Nataniel Ruiz, Yuanzhen Li, Varun Jampani, Yael Pritch, Michael Rubinstein, Kfir Aberman, DreamBooth: Fine Tuning Text-to-Image Diffusion Models for Subject-Driven Generation, 2022, https://arxiv.org/abs/2208.12242
+
+3. Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu ChenLoRA: Low-Rank Adaptation of Large Language Models,2021, https://arxiv.org/abs/2106.09685 
+
+4. Ruben Pascual, Mikel Sesma-Sara, Aranzazu Jurio, Daniel Paternain, Mikel Galar, Few-shot multi-token DreamBooth with LoRa for style-consistent character generation, 2025, https://arxiv.org/abs/2510.09475
+
+
+5. https://huggingface.co/docs/diffusers/training/dreambooth, accesssed: 07.02.2026
+6. https://oicm.docs.openinnovation.ai/latest/llm/lora-adapters.html#2-enabling-lora-in-fine-tuning, accesssed: 07.02.2026
+7. https://huggingface.co/docs/diffusers/training/lora, accesssed: 07.02.2026
+
+
+Preprocessing:
+
 
 Initial Model:
-https://modal.com/blog/fine-tuning-flux-style-lora
+https://modal.com/blog/fine-tuning-flux-style-lora, accesssed: 04.02.2026
 
