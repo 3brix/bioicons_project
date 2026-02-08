@@ -28,13 +28,17 @@ The initial plan was to find the data automatically (located on the github page 
 
 As a result, a local version was created which requires to first clone the bioicon repo or manually download the selected icons. The logic of the preprocessing loop remained identical: Using the folder structure,  SVGs were (at this point) filtered by target category (i proceded with animals, CC-0) and were converted into a 1024 pixel PNG using cairosvg, and processed with PIL to replace transparency with solid white background for better model compatibility. Finally, the script generates matching captions as TXT, based on the original filename of the svgs and utilizing a special trigger prompt to associate the visual data with the textual descriptions for training. All pairs (PNG + TXT) are saved in the directory static/png. The dataset was uploaded to modal volume using batch upload. 
 
-Later to be more straighforward, the local preprocessing was updated for manual curation and we switched to huggingface to host our test data (79 image caption pairs from catgory "Animals").
-
-*TO DO: The curation of the final dataset is yet to be done.*
+Later, to be more straightforward, the local preprocessing was updated for manual curation and we switched to Hugging Face to host our test data. During inspection we found that bioicons are visually not uniform across contributors: while the repository contains thousands of SVGs from many illustrators, some sources follow incompatible visual conventions for a single LoRA training set. In particular, icons credited to "Servier" (i.e., the Servier Medical Art library) follow a clean, minimal "icon" language (flat fills, black outlines, limited colors), whereas other large contributors (e.g., DBCLS) include much more detailed, multi-color, Illustrator-like exports with very large file sizes. Mixing these would teach the model conflicting visual rules and reduce style consistency. To maximize stylistic coherence, we therefore restricted the final training subset to a single source style family (Servier Medical Art, CC-BY-3.0) and expanded across multiple categories to increase subject diversity while keeping the style constant. The final selection contains 100 SVGs, distributed across categories such as Animals (19), Parasites (19), Lab_apparatus (15), Microbiology (15), Plants_Algae (10), Viruses (7), Oncology (5), Tissues (5), and Intracellular (5). We also addressed a near-duplicate issue inside categories (especially Animals), where many files were merely color variants of the same subject (e.g., multiple mouse/rabbit/fruitfly recolors).
 
 ## 5. Initial Model
 
 To build the initial pipeline, the script from the heroicons exercise was adapted. The initial model, Black Forest Labs FLUX.1 and its weights and the test dataset were loaded / fetched using huggingface. First test was succesful using lr 1e-4, max_trainstep 1000 and rank 16. The output is reasonable. 
+Initial Configuration Test:
+Learning Rate: 1e-4
+Max Training Steps: 1000
+LoRA Rank: 16
+Instance Prompt: "a bioicon style illustration of"
+Class Prompt: "a style illustration of" (for prior preservation)
 
 ## 6. Fine tuning and final model
 To find the optimal final model, we conducted an exhaustive hyperparameter search by testing all possible combinations of three key configurations. We experimented with three different learning rates (1e-4, 2e-4, 3e-4) to identify which rate enables the model to learn the Bioicon style most effectively and stably. We also evaluated four distinct training durations (1000, 1500, 3000, and 4000 steps) to determine the optimal point where the model captures the style well without overfitting to the training examples. Additionally, we tested three different LoRA adapter capacities (ranks 8, 16, and 32), which control how much the model can modify the original architecture.
@@ -46,15 +50,23 @@ The hyperparameter sweep successfully trained all 36 model configurations and re
 - Learning Rate: 2e-4 (balanced convergence speed and stability)
 - Training Steps: 3000 (sufficient for style capture without overfitting)
 - LoRA Rank: 16 (optimal capacity for style adaptation)
+
+## 7. Results
+The hyperparameter sweep successfully trained all 36 model configurations and revealed clear patterns in performance:
+- Learning Rate: 2e-4 (balanced convergence speed and stability)
+- Training Steps: 3000 (sufficient for style capture without overfitting)
+- LoRA Rank: 16 (optimal capacity for style adaptation)
 ## 8. Lessons / challenges / further ideas
 As we decided on the project to be to train Black Forests Flux.1-dev on Bioicons (similar to the Heroicons exercise), the first challenge was to understand the heroicons script. We read the comments and links provided in the script and consulted with a Modal blog of a similar project. We also used AI(Gemini/ChatGPT) to understand the code better. 
 
 The second problem we need to address was how to choose, download, curate and then preprocess the dataset. Then we needed to decide on a platform to host our dataset which enables us to share it and the pipeline to be reproducible as in the heroicons example. First we tried to work with a modal volume (suggested by ChatGPT), but then decided to switch to huggingface to be more strightforward. 
 
-More on AI: Fist we tried to work with AI, but it eventually made us take detours and suggested controversal procedures. It turned out to be easier and less frustrating to find blogs, examples and tutorials to adapt... However, AI was still helpful for gaining context and easily find resources. 
+More on AI: Fist we tried to work with AI, but it eventually made us take detours and suggested controversial procedures. It turned out to be easier and less frustrating to find blogs, examples and tutorials to adapt... However, AI was still helpful for gaining context and easily find resources. 
+
+Further work could focus on (1) expanding the curated dataset across more categories while keeping a single style family, (2) automating duplicate removal (e.g., hashing rendered PNGs to detect near-identical icons), and (3) running a broader hyperparameter sweep (rank, learning rate, training steps, and resolution) to study overfitting vs. generalization. In addition, we would like to test prompt/caption strategies more systematically—for example, comparing generic “bioicon style” prompts to captions that include the icon’s semantic label—to see how strongly the model learns style versus subject content.
 
 ## 9. References
-Literatur:
+Literature:
 1. Martini, L.; Iacono, S.; Zolezzi, D.; Vercelli, G.V. Advancing Persistent Character Generation: Comparative Analysis of Fine-Tuning Techniques for Diffusion Models. AI 2024, 5, 1779-1792. https://doi.org/10.3390/ai5040088
 
 2. Nataniel Ruiz, Yuanzhen Li, Varun Jampani, Yael Pritch, Michael Rubinstein, Kfir Aberman, DreamBooth: Fine Tuning Text-to-Image Diffusion Models for Subject-Driven Generation, 2022, https://arxiv.org/abs/2208.12242
