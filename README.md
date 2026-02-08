@@ -43,12 +43,12 @@ As we decided on the project to be to train Black Forests Flux.1-dev on Bioicons
 
 The second problem we need to address was how to choose, download, curate and then preprocess the dataset. Then we needed to decide on a platform to host our dataset which enables us to share it and the pipeline to be reproducible as in the heroicons example. First we tried to work with a modal volume (suggested by ChatGPT), but then decided to switch to huggingface to be more strightforward. 
 
-More on AI: Fist we tried to work with AI, but it eventually made us take detours and suggested controversal procedures. It turned out to be easier and less frustrating to find blogs, examples and tutorials to adapt... However, AI was still helpful for gaining context and easily find resources. 
+More on AI: Fist we tried to work with AI, but it eventually made us take detours and suggested controversial procedures. It turned out to be easier and less frustrating to find blogs, examples and tutorials to adapt... However, AI was still helpful for gaining context and easily find resources. 
 
 Further work could focus on (1) expanding the curated dataset across more categories while keeping a single style family, (2) automating duplicate removal (e.g., hashing rendered PNGs to detect near-identical icons), and (3) running a broader hyperparameter sweep (rank, learning rate, training steps, and resolution) to study overfitting vs. generalization. In addition, we would like to test prompt/caption strategies more systematically—for example, comparing generic “bioicon style” prompts to captions that include the icon’s semantic label—to see how strongly the model learns style versus subject content.
 
 ## 9. References
-Literatur:
+Literature:
 1. Martini, L.; Iacono, S.; Zolezzi, D.; Vercelli, G.V. Advancing Persistent Character Generation: Comparative Analysis of Fine-Tuning Techniques for Diffusion Models. AI 2024, 5, 1779-1792. https://doi.org/10.3390/ai5040088
 
 2. Nataniel Ruiz, Yuanzhen Li, Varun Jampani, Yael Pritch, Michael Rubinstein, Kfir Aberman, DreamBooth: Fine Tuning Text-to-Image Diffusion Models for Subject-Driven Generation, 2022, https://arxiv.org/abs/2208.12242
