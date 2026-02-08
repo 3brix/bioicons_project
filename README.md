@@ -33,10 +33,23 @@ Later, to be more straightforward, the local preprocessing was updated for manua
 ## 5. Initial Model
 
 To build the initial pipeline, the script from the heroicons exercise was adapted. The initial model, Black Forest Labs FLUX.1 and its weights and the test dataset were loaded / fetched using huggingface. First test was succesful using lr 1e-4, max_trainstep 1000 and rank 16. The output is reasonable. 
+Initial Configuration Test:
+Learning Rate: 1e-4
+Max Training Steps: 1000
+LoRA Rank: 16
+Instance Prompt: "a bioicon style illustration of"
+Class Prompt: "a style illustration of" (for prior preservation)
 
 ## 6. Fine tuning and final model
+To find the optimal final model, we conducted an exhaustive hyperparameter search by testing all possible combinations of three key configurations. We experimented with three different learning rates (1e-4, 2e-4, 3e-4) to identify which rate enables the model to learn the Bioicon style most effectively and stably. We also evaluated four distinct training durations (1000, 1500, 3000, and 4000 steps) to determine the optimal point where the model captures the style well without overfitting to the training examples. Additionally, we tested three different LoRA adapter capacities (ranks 8, 16, and 32), which control how much the model can modify the original architecture.
+
+In total, this resulted in 36 different combinations that we trained in parallel using Modal's infrastructure. Each resulting model was automatically evaluated with 15 test prompts covering diverse biological and scientific subjects, ranging from jellyfish to neurons and viruses. The results were organized into comparative tables in Weights & Biases, allowing us to visually identify which combination of hyperparameters produces the best Bioicon-style illustrations while maintaining the base model's capability to generate other types of images.
 
 ## 7. Results
+The hyperparameter sweep successfully trained all 36 model configurations and revealed clear patterns in performance:
+- Learning Rate: 2e-4 (balanced convergence speed and stability)
+- Training Steps: 3000 (sufficient for style capture without overfitting)
+- LoRA Rank: 16 (optimal capacity for style adaptation)
 
 ## 8. Lessons / challenges / further ideas
 As we decided on the project to be to train Black Forests Flux.1-dev on Bioicons (similar to the Heroicons exercise), the first challenge was to understand the heroicons script. We read the comments and links provided in the script and consulted with a Modal blog of a similar project. We also used AI(Gemini/ChatGPT) to understand the code better. 
