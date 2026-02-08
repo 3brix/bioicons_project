@@ -51,6 +51,11 @@ The hyperparameter sweep successfully trained all 36 model configurations and re
 - Training Steps: 3000 (sufficient for style capture without overfitting)
 - LoRA Rank: 16 (optimal capacity for style adaptation)
 
+## 7. Results
+The hyperparameter sweep successfully trained all 36 model configurations and revealed clear patterns in performance:
+- Learning Rate: 2e-4 (balanced convergence speed and stability)
+- Training Steps: 3000 (sufficient for style capture without overfitting)
+- LoRA Rank: 16 (optimal capacity for style adaptation)
 ## 8. Lessons / challenges / further ideas
 As we decided on the project to be to train Black Forests Flux.1-dev on Bioicons (similar to the Heroicons exercise), the first challenge was to understand the heroicons script. We read the comments and links provided in the script and consulted with a Modal blog of a similar project. We also used AI(Gemini/ChatGPT) to understand the code better. 
 
